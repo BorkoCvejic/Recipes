@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Recipes</string>
+    <string name="label_order_now">ORDER NOW</string>
+</resources>
