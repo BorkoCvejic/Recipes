@@ -6,11 +6,11 @@
 
     <fragment
         android:id="@+id/recipeFragment"
-        android:name="com.easycruise.recipes_compose.ui.RecipeFragment"
+        android:name="com.easycruise.recipes_compose.presentation.ui.recipe.RecipeFragment"
         android:label="RecipeFragment" />
     <fragment
         android:id="@+id/recipeListFragment"
-        android:name="com.easycruise.recipes_compose.ui.RecipeListFragment"
+        android:name="com.easycruise.recipes_compose.presentation.ui.recipe_list.RecipeListFragment"
         android:label="RecipeListFragment" >
         <action
             android:id="@+id/showRecipe"

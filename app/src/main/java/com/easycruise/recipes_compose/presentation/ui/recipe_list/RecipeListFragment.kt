@@ -1,4 +1,4 @@
-package com.easycruise.recipes_compose.ui
+package com.easycruise.recipes_compose.presentation.ui.recipe_list
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,10 +14,21 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.easycruise.recipes_compose.R
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class RecipeListFragment: Fragment() {
+
+    val viewModel: RecipeListViewModel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        println("FRAGMENT:  ${viewModel.getRepo()} ")
+        println("FRAGMENT:  ${viewModel.getToken()} ")
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
