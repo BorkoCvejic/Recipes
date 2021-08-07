@@ -16,7 +16,7 @@ class RecipeListViewModel
 @Inject
 constructor(
     private val repository: RecipeRepository,
-    private @Named("auth_token") val token: String
+    @Named("auth_token") private val token: String
 ): ViewModel() {
 
     //standard way of getting data from response
@@ -28,20 +28,33 @@ constructor(
     //better way for compose
     val recipes: MutableState<List<Recipe>> = mutableStateOf(listOf()) //can be changed
 
+    val query = mutableStateOf("")
+
+    val selectedCategory: MutableState<FoodCategory?> = mutableStateOf(null) // chip selected, viewModel survives phone rotation
 
     init {
         newSearch()
     }
 
-    private fun newSearch() {
+    fun newSearch() {
         viewModelScope.launch {
             val result = repository.search(
                 token = token,
                 page = 1,
-                query = "chicken"
+                query = query.value
             )
             recipes.value = result
-
         }
     }
+
+    fun onQueryChanged(query: String) {
+        this.query.value = query
+    }
+
+    fun onSelectedCategoryChanged(category: String) {
+        val newCategory = getFoodCategory(category)
+        selectedCategory.value = newCategory
+        onQueryChanged(category)
+    }
+
 }
