@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -18,9 +20,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.easycruise.recipes_compose.R
-import com.easycruise.recipes_compose.presentation.components.CircularIndeterminateProgressBar
-import com.easycruise.recipes_compose.presentation.components.RecipeCard
-import com.easycruise.recipes_compose.presentation.components.SearchAppBar
+import com.easycruise.recipes_compose.presentation.components.*
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -77,6 +77,16 @@ class RecipeListFragment: Fragment() {
                             isDisplayed = loading
                         )
                     }
+
+                    //                    PulsingDemo()
+//
+//                    val state = remember{ mutableStateOf(HeartAnimationDefinition.HeartButtonState.IDLE) }
+//                    AnimatedHeartButton(
+//                        buttonState = state,
+//                        onToggle = {
+//                            state.value = if (state.value == HeartAnimationDefinition.HeartButtonState.IDLE) HeartAnimationDefinition.HeartButtonState.ACTIVE else HeartAnimationDefinition.HeartButtonState.IDLE
+//                        }
+//                    )
                 }
             }
         }
