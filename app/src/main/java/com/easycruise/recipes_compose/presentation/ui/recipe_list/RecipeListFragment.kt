@@ -4,10 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -15,6 +18,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.easycruise.recipes_compose.R
+import com.easycruise.recipes_compose.presentation.components.CircularIndeterminateProgressBar
 import com.easycruise.recipes_compose.presentation.components.RecipeCard
 import com.easycruise.recipes_compose.presentation.components.SearchAppBar
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,6 +44,8 @@ class RecipeListFragment: Fragment() {
                 val keyboardController = LocalSoftwareKeyboardController.current
                 val focusManager = LocalFocusManager.current
 
+                val loading = viewModel.loading.value
+
                 Column {
 
                     SearchAppBar(  //state hoisting, moving states to separate composable (stateless composable, can't change state itself), also improves reusability
@@ -52,16 +58,24 @@ class RecipeListFragment: Fragment() {
                         focusManager = focusManager
                     )
 
-                    LazyColumn {
-                        itemsIndexed(
-                            items = recipes
-                        ) { index, recipe ->
-                            RecipeCard(
-                                recipe = recipe,
-                                onClick = {
-                                    findNavController().navigate(R.id.showRecipe)
-                                })
+                    Box(  // overlays children, lower views will be on top
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        LazyColumn {
+                            itemsIndexed(
+                                items = recipes
+                            ) { index, recipe ->
+                                RecipeCard(
+                                    recipe = recipe,
+                                    onClick = {
+                                        findNavController().navigate(R.id.showRecipe)
+                                    })
+                            }
                         }
+
+                        CircularIndeterminateProgressBar(
+                            isDisplayed = loading
+                        )
                     }
                 }
             }
