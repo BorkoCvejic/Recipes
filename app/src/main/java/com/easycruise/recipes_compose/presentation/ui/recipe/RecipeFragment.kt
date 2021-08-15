@@ -39,7 +39,7 @@ class RecipeFragment: Fragment() {
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
-                            color = Color(ContextCompat.getColor(LocalContext.current, R.color.lightGray))
+                            color = Color(ContextCompat.getColor(LocalContext.current, R.color.blue_700))
                         )
                         .verticalScroll(
                             state = rememberScrollState()
@@ -63,7 +63,7 @@ class RecipeFragment: Fragment() {
                             )
                             Text(text = "$5.99",
                                 style = TextStyle(
-                                    color = Color(ContextCompat.getColor(LocalContext.current, R.color.lightGreen)),
+                                    color = Color(ContextCompat.getColor(LocalContext.current, R.color.blue_500)),
                                     fontSize = 17.sp
                                 ),
                                 modifier = Modifier.align(Alignment.CenterVertically)
