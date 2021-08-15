@@ -6,11 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -55,27 +54,32 @@ class RecipeListFragment: Fragment() {
 
                     val loading = viewModel.loading.value
 
-                    Column(
-                        modifier = Modifier.background(color = MaterialTheme.colors.surface)
+                    Scaffold(
+                        topBar = {
+                            SearchAppBar(  //state hoisting, moving states to separate composable (stateless composable, can't change state itself), also improves reusability
+                                query = query,
+                                onQueryChanged = viewModel::onQueryChanged,
+                                onExecuteSearch = viewModel::newSearch,
+                                selectedCategory = selectedCategory,
+                                onSelectedCategoryChanged = viewModel::onSelectedCategoryChanged,
+                                keyboardController = keyboardController,
+                                focusManager = focusManager,
+                                onToggleTheme = {
+                                    application.toggleTheme()
+                                }
+                            )
+                        },
+                        bottomBar = {
+                            MyBottomBar()
+                        },
+                        drawerContent = {
+                            MyDrawer()
+                        },
                     ) {
-
-                        SearchAppBar(  //state hoisting, moving states to separate composable (stateless composable, can't change state itself), also improves reusability
-                            query = query,
-                            onQueryChanged = viewModel::onQueryChanged,
-                            onExecuteSearch = viewModel::newSearch,
-                            selectedCategory = selectedCategory,
-                            onSelectedCategoryChanged = viewModel::onSelectedCategoryChanged,
-                            keyboardController = keyboardController,
-                            focusManager = focusManager,
-                            onToggleTheme = {
-                                application.toggleTheme()
-                            }
-                        )
-
                         Box(  // overlays children, lower views will be on top
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(color = MaterialTheme.colors.background)
+                                .background(color = MaterialTheme.colors.surface)
                         ) {
                             LazyColumn {
                                 itemsIndexed(
@@ -93,6 +97,7 @@ class RecipeListFragment: Fragment() {
                                 isDisplayed = loading
                             )
                         }
+                    }
 
                     // PulsingDemo()
                     //
@@ -103,7 +108,6 @@ class RecipeListFragment: Fragment() {
                     //          state.value = if (state.value == HeartAnimationDefinition.HeartButtonState.IDLE) HeartAnimationDefinition.HeartButtonState.ACTIVE else HeartAnimationDefinition.HeartButtonState.IDLE
                     //      }
                     //  )
-                    }
                 }
             }
         }
