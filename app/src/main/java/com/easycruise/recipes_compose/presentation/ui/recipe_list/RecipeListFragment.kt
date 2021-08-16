@@ -1,6 +1,7 @@
 package com.easycruise.recipes_compose.presentation.ui.recipe_list
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -59,6 +60,8 @@ class RecipeListFragment: Fragment() {
 
                     val loading = viewModel.loading.value
 
+                    val page = viewModel.page.value
+
                     val scaffoldState = rememberScaffoldState() //this will persist across recomposes
 
                     Scaffold(
@@ -103,18 +106,25 @@ class RecipeListFragment: Fragment() {
                                 .fillMaxSize()
                                 .background(color = MaterialTheme.colors.surface)
                         ) {
-                            LazyColumn {
-                                itemsIndexed(
-                                    items = recipes
-                                ) { index, recipe ->
-                                    RecipeCard(
-                                        recipe = recipe,
-                                        onClick = {
-                                            findNavController().navigate(R.id.showRecipe)
-                                        })
+                            if (loading && recipes.isEmpty()) {
+                                Log.d("RecipeListFragment", "loading") // add shimmer effect
+                            } else {
+                                LazyColumn {
+                                    itemsIndexed(
+                                        items = recipes
+                                    ) { index, recipe ->
+                                        viewModel.onChangeRecipeScrollPosition(index)
+                                        if ((index + 1) >= (page * PAGE_SIZE) && !loading) {
+                                            viewModel.nextPage()
+                                        }
+                                        RecipeCard(
+                                            recipe = recipe,
+                                            onClick = {
+                                                findNavController().navigate(R.id.showRecipe)
+                                            })
+                                    }
                                 }
                             }
-
                             CircularIndeterminateProgressBar(
                                 isDisplayed = loading
                             )
