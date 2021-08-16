@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.easycruise.recipes_compose.domain.model.Recipe
 import com.easycruise.recipes_compose.repository.RecipeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
@@ -27,7 +26,7 @@ constructor(
 
 
     //better way for compose
-    val recipes: MutableState<List<Recipe>> = mutableStateOf(listOf()) //can be changed
+    val recipes: MutableState<List<Recipe>> = mutableStateOf(listOf()) //can be changed, store the value AND in case I update value trigger recompose for all elements using this data.
 
     val query = mutableStateOf("")
 

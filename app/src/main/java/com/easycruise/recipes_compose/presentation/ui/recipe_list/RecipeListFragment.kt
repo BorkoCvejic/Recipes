@@ -9,7 +9,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -17,12 +20,14 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.easycruise.recipes_compose.R
 import com.easycruise.recipes_compose.presentation.BaseApplication
 import com.easycruise.recipes_compose.presentation.components.*
 import com.easycruise.recipes_compose.ui.theme.RecipesTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -54,12 +59,25 @@ class RecipeListFragment: Fragment() {
 
                     val loading = viewModel.loading.value
 
+                    val scaffoldState = rememberScaffoldState() //this will persist across recomposes
+
                     Scaffold(
                         topBar = {
                             SearchAppBar(  //state hoisting, moving states to separate composable (stateless composable, can't change state itself), also improves reusability
                                 query = query,
                                 onQueryChanged = viewModel::onQueryChanged,
-                                onExecuteSearch = viewModel::newSearch,
+                                onExecuteSearch = {
+                                    if (viewModel.selectedCategory.value?.value == "Milk") {
+                                        lifecycleScope.launch {
+                                            scaffoldState.snackbarHostState.showSnackbar(
+                                                message = "Invalid category: MILK",
+                                                actionLabel = "Hide"
+                                            )
+                                        }
+                                    } else {
+                                        viewModel.newSearch()  //we want snackbar to go away if fragment is destroyed therefore we use lifecycleScope
+                                    }
+                                },
                                 selectedCategory = selectedCategory,
                                 onSelectedCategoryChanged = viewModel::onSelectedCategoryChanged,
                                 keyboardController = keyboardController,
@@ -69,12 +87,16 @@ class RecipeListFragment: Fragment() {
                                 }
                             )
                         },
-                        bottomBar = {
-                            MyBottomBar()
-                        },
+//                        bottomBar = {
+//                            MyBottomBar()
+//                        },
                         drawerContent = {
                             MyDrawer()
                         },
+                        scaffoldState = scaffoldState,
+                        snackbarHost = {
+                            scaffoldState.snackbarHostState
+                        }
                     ) {
                         Box(  // overlays children, lower views will be on top
                             modifier = Modifier
@@ -95,6 +117,13 @@ class RecipeListFragment: Fragment() {
 
                             CircularIndeterminateProgressBar(
                                 isDisplayed = loading
+                            )
+                            DefaultSnackbar(
+                                snackbarHostState = scaffoldState.snackbarHostState,
+                                onDismiss = {
+                                    scaffoldState.snackbarHostState.currentSnackbarData?.dismiss()
+                                },
+                                modifier = Modifier.align(Alignment.BottomCenter)
                             )
                         }
                     }
