@@ -4,82 +4,95 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.Text
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.easycruise.recipes_compose.R
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import com.easycruise.recipes_compose.presentation.BaseApplication
+import com.easycruise.recipes_compose.presentation.components.CircularIndeterminateProgressBar
+import com.easycruise.recipes_compose.presentation.components.DefaultSnackbar
+import com.easycruise.recipes_compose.presentation.components.RecipeView
+import com.easycruise.recipes_compose.presentation.ui.recipe.RecipeEvent.GetRecipeEvent
+import com.easycruise.recipes_compose.ui.theme.RecipesTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class RecipeFragment: Fragment() {
+class RecipeFragment : Fragment() {
+
+    @Inject
+    lateinit var application: BaseApplication
+
+    private val viewModel: RecipeViewModel by viewModels()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
+        arguments?.getInt("recipeId")?.let { rId ->
+            viewModel.onTriggerEvent(GetRecipeEvent(rId))
+        }
+
         return ComposeView(requireContext()).apply {
             setContent {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            color = Color(ContextCompat.getColor(LocalContext.current, R.color.blue_700))
-                        )
-                        .verticalScroll(
-                            state = rememberScrollState()
-                        )
+
+                val loading = viewModel.loading.value
+
+                val recipe = viewModel.recipe.value
+
+                val scaffoldState = rememberScaffoldState()
+
+                RecipesTheme(
+                    darkTheme = application.isDark.value
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_ice_cream),
-                        contentDescription = null,
-                        Modifier.height(300.dp),
-                        contentScale = ContentScale.Crop
-                    )
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = "Happy meal",
-//                color = Color.White,
-                                fontSize = 26.sp
-                            )
-                            Text(text = "$5.99",
-                                style = TextStyle(
-                                    color = Color(ContextCompat.getColor(LocalContext.current, R.color.blue_500)),
-                                    fontSize = 17.sp
-                                ),
-                                modifier = Modifier.align(Alignment.CenterVertically)
-                            )
+                    Scaffold(
+                        scaffoldState = scaffoldState,
+                        snackbarHost = {
+                            scaffoldState.snackbarHostState
                         }
-                        Spacer(modifier = Modifier.padding(top = 10.dp))
-                        Text(
-                            text = "800 Calories",
-                            fontSize = 17.sp
-                        )
-                        Spacer(modifier = Modifier.padding(top = 10.dp))
-                        Button(
-                            onClick = {},
-                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
                         ) {
-                            Text(text = LocalContext.current.getString(R.string.label_order_now))
+                            if (loading && recipe == null) {
+                                Text(text = "Loading")
+                            } else {
+                                recipe?.let { recipe ->
+                                    if (recipe.id == 1) {
+                                        lifecycleScope.launch {
+                                            scaffoldState.snackbarHostState.showSnackbar(
+                                                message = "An error occured with this recipe.",
+                                                actionLabel = "OK",
+                                                duration = SnackbarDuration.Short
+                                            )
+                                        }
+                                    } else {
+                                        RecipeView(recipe = recipe)
+                                    }
+                                }
+                            }
+
+                            CircularIndeterminateProgressBar(isDisplayed = loading)
+                            DefaultSnackbar(
+                                snackbarHostState = scaffoldState.snackbarHostState,
+                                onDismiss = {
+                                    scaffoldState.snackbarHostState.currentSnackbarData?.dismiss()
+                                    activity?.onBackPressed()
+                                },
+                                modifier = Modifier.align(Alignment.BottomCenter)
+                            )
                         }
                     }
                 }
