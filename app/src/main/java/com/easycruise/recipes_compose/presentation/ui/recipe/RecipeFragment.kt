@@ -10,15 +10,12 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.easycruise.recipes_compose.presentation.BaseApplication
-import com.easycruise.recipes_compose.presentation.components.CircularIndeterminateProgressBar
-import com.easycruise.recipes_compose.presentation.components.DefaultSnackbar
 import com.easycruise.recipes_compose.presentation.components.RecipeView
 import com.easycruise.recipes_compose.presentation.ui.recipe.RecipeEvent.GetRecipeEvent
 import com.easycruise.recipes_compose.ui.theme.RecipesTheme
@@ -54,7 +51,9 @@ class RecipeFragment : Fragment() {
                 val scaffoldState = rememberScaffoldState()
 
                 RecipesTheme(
-                    darkTheme = application.isDark.value
+                    darkTheme = application.isDark.value,
+                    displayProgressBar = loading,
+                    scaffoldState = scaffoldState
                 ) {
                     Scaffold(
                         scaffoldState = scaffoldState,
@@ -77,22 +76,13 @@ class RecipeFragment : Fragment() {
                                                 actionLabel = "OK",
                                                 duration = SnackbarDuration.Short
                                             )
+                                            activity?.onBackPressed()
                                         }
                                     } else {
                                         RecipeView(recipe = recipe)
                                     }
                                 }
                             }
-
-                            CircularIndeterminateProgressBar(isDisplayed = loading)
-                            DefaultSnackbar(
-                                snackbarHostState = scaffoldState.snackbarHostState,
-                                onDismiss = {
-                                    scaffoldState.snackbarHostState.currentSnackbarData?.dismiss()
-                                    activity?.onBackPressed()
-                                },
-                                modifier = Modifier.align(Alignment.BottomCenter)
-                            )
                         }
                     }
                 }

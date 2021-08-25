@@ -1,21 +1,12 @@
 package com.easycruise.recipes_compose.presentation.ui.recipe_list
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -23,9 +14,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.easycruise.recipes_compose.R
 import com.easycruise.recipes_compose.presentation.BaseApplication
-import com.easycruise.recipes_compose.presentation.components.*
+import com.easycruise.recipes_compose.presentation.components.MyDrawer
+import com.easycruise.recipes_compose.presentation.components.RecipeList
+import com.easycruise.recipes_compose.presentation.components.SearchAppBar
 import com.easycruise.recipes_compose.ui.theme.RecipesTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -48,22 +40,24 @@ class RecipeListFragment: Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
 
+                val recipes = viewModel.recipes.value
+                val query = viewModel.query.value
+                val selectedCategory = viewModel.selectedCategory.value
+
+                val keyboardController = LocalSoftwareKeyboardController.current
+                val focusManager = LocalFocusManager.current
+
+                val loading = viewModel.loading.value
+
+                val page = viewModel.page.value
+
+                val scaffoldState = rememberScaffoldState() //this will persist across recomposes
+
                 RecipesTheme(
-                    darkTheme = application.isDark.value
+                    darkTheme = application.isDark.value,
+                    displayProgressBar = loading,
+                    scaffoldState = scaffoldState
                 ) {
-                    val recipes = viewModel.recipes.value
-                    val query = viewModel.query.value
-                    val selectedCategory = viewModel.selectedCategory.value
-
-                    val keyboardController = LocalSoftwareKeyboardController.current
-                    val focusManager = LocalFocusManager.current
-
-                    val loading = viewModel.loading.value
-
-                    val page = viewModel.page.value
-
-                    val scaffoldState = rememberScaffoldState() //this will persist across recomposes
-
                     Scaffold(
                         topBar = {
                             SearchAppBar(  //state hoisting, moving states to separate composable (stateless composable, can't change state itself), also improves reusability
@@ -107,7 +101,6 @@ class RecipeListFragment: Fragment() {
                             onChangeRecipeScrollPosition = viewModel::onChangeRecipeScrollPosition,
                             page = page,
                             nextPage = viewModel::nextPage,
-                            scaffoldState = scaffoldState,
                             navController = findNavController()
                         )
                     }

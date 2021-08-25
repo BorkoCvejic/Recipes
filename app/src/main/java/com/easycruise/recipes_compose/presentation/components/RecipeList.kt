@@ -24,7 +24,6 @@ fun RecipeList(
     onChangeRecipeScrollPosition: (Int) -> Unit,
     page: Int,
     nextPage: () -> Unit,
-    scaffoldState: ScaffoldState,
     navController: NavController
 ) {
     Box(  // overlays children, lower views will be on top
@@ -55,15 +54,5 @@ fun RecipeList(
                 }
             }
         }
-        CircularIndeterminateProgressBar(
-            isDisplayed = loading
-        )
-        DefaultSnackbar(
-            snackbarHostState = scaffoldState.snackbarHostState,
-            onDismiss = {
-                scaffoldState.snackbarHostState.currentSnackbarData?.dismiss()
-            },
-            modifier = Modifier.align(Alignment.BottomCenter)
-        )
     }
 }
