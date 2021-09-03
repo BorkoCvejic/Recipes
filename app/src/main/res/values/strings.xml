@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Recipes</string>
     <string name="label_order_now">ORDER NOW</string>
+    <string name="label_show_ingredients">Show ingredients</string>
+    <string name="label_updated_publisher">"Updated %s by %s"</string>
+    <string name="label_by_publisher">"By %s"</string>
+
 </resources>

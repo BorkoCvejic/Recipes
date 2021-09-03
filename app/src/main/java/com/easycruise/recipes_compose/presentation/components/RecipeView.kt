@@ -1,39 +1,58 @@
 package com.easycruise.recipes_compose.presentation.components
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.easycruise.recipes_compose.R
 import com.easycruise.recipes_compose.domain.model.Recipe
 import com.easycruise.recipes_compose.util.DEFAULT_RECIPE_IMAGE
 import com.easycruise.recipes_compose.util.loadPicture
 
 const val IMAGE_HEIGHT = 260
 
+@ExperimentalAnimationApi
 @Preview(showBackground = true)
 @Composable
 fun TestRecipe() {
     RecipeView(
         recipe = Recipe(
-            2, "Test dugackog titlea", "Borko Cvejic", null, 20, null, null, null,
-            listOf("Prvi", "Drugi", "Treci"), null, null, null, null
+            id = 2,
+            title = "Test dugackog titlea",
+            publisher = "Borko Cvejic",
+            rating =  20,
+            ingredients = listOf("Prvi", "Drugi", "Treci"),
+            featuredImage = "https://picsum.photos/300/300"
         )
     )
 }
 
+@ExperimentalAnimationApi
 @Composable
 fun RecipeView(
     recipe: Recipe
 ) {
+
+    val showIngredients = remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -73,42 +92,75 @@ fun RecipeView(
                             .wrapContentWidth(Alignment.Start),
                         style = MaterialTheme.typography.h3
                     )
+                    Column() {
+                        val rank = recipe.rating.toString()
+                        Text(
+                            text = rank,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentWidth(Alignment.End),
+                            style = MaterialTheme.typography.h5
+                        )
 
-                    val rank = recipe.rating.toString()
-                    Text(
-                        text = rank,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentWidth(Alignment.End)
-                            .align(Alignment.CenterVertically),
-                        style = MaterialTheme.typography.h5
-                    )
+                        val incrementRank = remember {
+                            mutableStateOf(recipe.rating)
+                        }
+                        Text(
+                            text = incrementRank.value.toString(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentWidth(Alignment.End),
+                            style = MaterialTheme.typography.h5
+                        )
 
+                        Button(onClick = {
+                            incrementRank.value = incrementRank.value?.plus(1)
+                        }) {
+                            Text(text = "+1")
+                        }
+                    }
                 }
 
-                recipe.publisher?.let { publisher ->
+                Row {
+                    recipe.publisher?.let { publisher ->
+                        Text(
+                            text = recipe.dateUpdated?.let { updated ->
+                                stringResource(id = R.string.label_updated_publisher, updated, publisher)
+                            } ?: kotlin.run {
+                                stringResource(id = R.string.label_by_publisher, publisher)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth(0.7f)
+                                .padding(bottom = 8.dp)
+                                .align(CenterVertically),
+                            style = MaterialTheme.typography.caption,
+                        )
+                    }
+
                     Text(
-                        text = recipe.dateUpdated?.let { updated ->
-                            "Updated $updated by $publisher "
-                        } ?: kotlin.run {
-                            "By $publisher"
+                        text = stringResource(id = R.string.label_show_ingredients),
+                        Modifier.clickable {
+                            showIngredients.value = !showIngredients.value
                         },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp),
-                        style = MaterialTheme.typography.caption
+                        textAlign = TextAlign.Center
                     )
                 }
 
                 recipe.ingredients?.let { ingredientsList ->
                     for (ingredient in ingredientsList) {
-                        Text(
-                            text = ingredient,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            style = MaterialTheme.typography.body1
-                        )
+                        AnimatedVisibility(
+                            visible = showIngredients.value,
+                            enter = slideInHorizontally() + fadeIn(initialAlpha = 0.3f, animationSpec = tween(durationMillis = 750, easing = LinearOutSlowInEasing)),
+                            exit = shrinkHorizontally(shrinkTowards = Alignment.CenterHorizontally, animationSpec = tween(durationMillis = 750, easing = LinearEasing))
+                        ) {
+                            Text(
+                                text = ingredient,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp),
+                                style = MaterialTheme.typography.body1
+                            )
+                        }
                     }
                 }
             }

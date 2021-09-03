@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.easycruise.recipes_compose.domain.model.Recipe
 import com.easycruise.recipes_compose.util.DEFAULT_RECIPE_IMAGE
@@ -68,4 +69,19 @@ fun RecipeCard(
             }
         }
     }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun RecipeCardPreview() {
+    RecipeCard(
+        recipe = Recipe(
+            id = 1,
+            title = "Chicken pasta",
+            publisher = "Borko Cvejic",
+            rating =  20,
+            ingredients =  listOf("Test", "test test", "test test test")
+        ),
+        onClick = { }
+    )
 }

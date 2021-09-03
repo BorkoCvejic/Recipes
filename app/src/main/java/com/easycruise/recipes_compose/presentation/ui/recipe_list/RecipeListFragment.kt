@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.easycruise.recipes_compose.R
 import com.easycruise.recipes_compose.presentation.BaseApplication
 import com.easycruise.recipes_compose.presentation.components.MyDrawer
 import com.easycruise.recipes_compose.presentation.components.RecipeList
@@ -101,7 +102,7 @@ class RecipeListFragment: Fragment() {
                             onChangeRecipeScrollPosition = viewModel::onChangeRecipeScrollPosition,
                             page = page,
                             nextPage = viewModel::nextPage,
-                            navController = findNavController()
+                            onNavigate = { dest, bundle -> findNavController().navigate(dest, bundle) }
                         )
                     }
 

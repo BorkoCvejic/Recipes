@@ -36,7 +36,7 @@ fun PulsingDemo() {
         modifier = Modifier
             .fillMaxWidth()
             .height(55.dp),
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
         Image(
             imageVector = Icons.Default.Favorite,
@@ -46,16 +46,15 @@ fun PulsingDemo() {
                 .height(pulseState.value.dp)
                 .width(pulseState.value.dp)
         )
-    }
 
-    Canvas(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(55.dp)
-    ) {
-        drawCircle(
-            radius = pulseState.value,
-            brush = color
-        )
+        Canvas(
+            modifier = Modifier
+                .height(55.dp)
+        ) {
+            drawCircle(
+                radius = pulseState.value,
+                brush = color
+            )
+        }
     }
 }

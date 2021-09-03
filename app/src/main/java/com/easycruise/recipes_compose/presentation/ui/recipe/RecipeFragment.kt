@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Scaffold
@@ -31,6 +32,7 @@ class RecipeFragment : Fragment() {
 
     private val viewModel: RecipeViewModel by viewModels()
 
+    @ExperimentalAnimationApi // need this for animations in RecipeView
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -79,7 +81,9 @@ class RecipeFragment : Fragment() {
                                             activity?.onBackPressed()
                                         }
                                     } else {
-                                        RecipeView(recipe = recipe)
+                                        RecipeView(
+                                            recipe = recipe
+                                        )
                                     }
                                 }
                             }

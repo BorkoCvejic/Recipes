@@ -24,7 +24,7 @@ fun RecipeList(
     onChangeRecipeScrollPosition: (Int) -> Unit,
     page: Int,
     nextPage: () -> Unit,
-    navController: NavController
+    onNavigate: (dest: Int, bundle: Bundle) -> Unit
 ) {
     Box(  // overlays children, lower views will be on top
         modifier = Modifier
@@ -48,8 +48,8 @@ fun RecipeList(
                             val bundle = Bundle()
                             recipe.id?.let { id ->
                                 bundle.putInt("recipeId", id)
+                                onNavigate(R.id.showRecipe, bundle)
                             }
-                            navController.navigate(R.id.showRecipe, bundle)
                         })
                 }
             }
