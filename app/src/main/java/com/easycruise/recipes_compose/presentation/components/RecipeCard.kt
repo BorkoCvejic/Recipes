@@ -80,7 +80,8 @@ fun RecipeCardPreview() {
             title = "Chicken pasta",
             publisher = "Borko Cvejic",
             rating =  20,
-            ingredients =  listOf("Test", "test test", "test test test")
+            ingredients =  listOf("Test", "test test", "test test test"),
+            featuredImage = "https://picsum.photos/200/300"
         ),
         onClick = { }
     )
